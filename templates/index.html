@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>3 en Raya - Flask</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background-color: #f4f4f4; }
+        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; margin-top: 20px; }
+        .cell { width: 100px; height: 100px; background: white; border: 2px solid #333; font-size: 2em; display: flex; align-items: center; justify-content: center; text-decoration: none; color: black; }
+        .cell:hover { background: #eee; }
+        .winner { color: green; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>3 en Raya</h1>
+    
+    {% if winner %}
+        <h2 class="winner">
+            {% if winner == "Empate" %} ¡Es un empate! {% else %} ¡Ganador: {{ winner }}! {% endif %}
+        </h2>
+    {% else %}
+        <p>Turno de: <strong>{{ turn }}</strong></p>
+    {% endif %}
+
+    <div class="grid">
+        {% for i in range(9) %}
+            {% if board[i] == "" and not winner %}
+                <a href="{{ url_for('move', pos=i) }}" class="cell"></a>
+            {% else %}
+                <div class="cell">{{ board[i] }}</div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <br>
+    <a href="{{ url_for('reset') }}" style="padding: 10px; background: #333; color: white; text-decoration: none; border-radius: 5px;">Reiniciar Juego</a>
+</body>
+</html>
