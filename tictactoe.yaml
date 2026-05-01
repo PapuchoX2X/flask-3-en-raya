@@ -1,0 +1,35 @@
+# Esta sección define el "Deployment" (quién controla los contenedores)
+apiVersion: apps/v1          # Versión de la API de Kubernetes para aplicaciones
+kind: Deployment             # Tipo de recurso: Un controlador de despliegue
+metadata:
+  name: tictactoe-deployment # El nombre único de este despliegue en el clúster
+spec:
+  replicas: 2                # Número de copias (Pods) idénticas que quieres corriendo
+  selector:
+    matchLabels:
+      app: tictactoe         # Indica que este Deployment debe controlar a los Pods con esta etiqueta
+  template:                  # La "plantilla" de cómo debe ser cada Pod nuevo
+    metadata:
+      labels:
+        app: tictactoe       # Etiqueta que se le pone a los Pods para que el Service los encuentre
+    spec:
+      containers:            # Especificaciones del contenedor dentro del Pod
+      - name: flask-app      # Nombre interno del contenedor
+        image: tictactoe:v1  # Nombre de la imagen de Docker que construiste y cargaste
+        imagePullPolicy: Never # ¡Clave! Le dice que NO busque la imagen en internet, sino en tu laptop[cite: 1]
+        ports:
+        - containerPort: 5000 # Puerto interno en el que escucha tu aplicación Flask[cite: 1]
+---
+# Esta sección define el "Service" (la puerta de entrada o red)
+apiVersion: v1               # Versión de la API para servicios básicos
+kind: Service                # Tipo de recurso: Un servicio de red
+metadata:
+  name: tictactoe-service    # El nombre de red para contactar a tu app[cite: 1]
+spec:
+  selector:
+    app: tictactoe           # "Busca todos los Pods que tengan la etiqueta app: tictactoe"[cite: 1]
+  ports:
+    - protocol: TCP          # Protocolo de red estándar
+      port: 80               # Puerto "externo" (por el que tú entras)[cite: 1]
+      targetPort: 5000       # Puerto "interno" (hacia donde se redirige el tráfico en el contenedor)[cite: 1]
+  type: ClusterIP            # Tipo de servicio: Solo accesible dentro del clúster (o vía túnel)[cite: 1]
